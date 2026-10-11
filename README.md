@@ -4,8 +4,10 @@ Steam Deck presets for **World of Warcraft: Forever**. Pick a preset, keep it or
 after 15 seconds, done. Every preset was measured on a Steam Deck OLED: frame rate, 1% lows and
 battery draw, in the open world and in a capital.
 
-Companion to the [DeckForever](https://github.com/eliog/DeckForever) installer, which sets up
-Battle.net and WoW: Forever on the Deck. The addon works on its own too.
+**Designed to go with the [DeckForever app](https://github.com/eliog/DeckForever)**, which installs
+Battle.net and WoW: Forever on the Steam Deck, adds them to the Steam library, and can repair, back
+up or uninstall the setup. The app gets the game running; this addon tunes it. The addon also works
+on its own if you set up the game another way.
 
 ## Presets
 
@@ -50,7 +52,9 @@ the preset that stays smooth there.
 
 ## Install
 
-From CurseForge or Wago, or download the zip from
+New to WoW: Forever on the Deck? Start with the [DeckForever app](https://github.com/eliog/DeckForever).
+
+Download the zip from
 [Releases](https://github.com/eliog/DeckForeverAddon/releases) and extract it into
 `World of Warcraft/_classic_beta_/Interface/AddOns/` (the client folder for WoW: Forever).
 
