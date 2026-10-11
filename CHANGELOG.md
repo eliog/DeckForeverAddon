@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Published on CurseForge. No changes in game.
+
 ## 1.0.0
 
 First release.

@@ -54,7 +54,8 @@ the preset that stays smooth there.
 
 New to WoW: Forever on the Deck? Start with the [DeckForever app](https://github.com/eliog/DeckForever).
 
-Download the zip from
+Install it from [CurseForge](https://www.curseforge.com/projects/1739370) (search for
+*DeckForever* in the CurseForge app), or download the zip from
 [Releases](https://github.com/eliog/DeckForeverAddon/releases) and extract it into
 `World of Warcraft/_classic_beta_/Interface/AddOns/` (the client folder for WoW: Forever).
 
