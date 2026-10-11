@@ -143,31 +143,87 @@ ns.Window.RegisterTab("deck", "Steam Deck", function(page)
 	page.rows = {}
 	for i in ipairs(ns.DECK_GUIDE.rows) do page.rows[i] = MakeRow(panel) end
 
-	-- right: pick a preset, then why the marked rows are set that way
-	local x = PANEL_W + 18
-	page.presets = W.Segmented(page, W.PresetItems(), 150, 30, Window.SetSelectedKey)
-	for i, b in ipairs(page.presets) do b:SetPoint("TOPLEFT", x, -4 - (i - 1) * 34) end
-	page.presetButtons = page.presets.buttons
+	-- right: which preset, then step by step what to do on the Deck
+	local x, colW = PANEL_W + 18, 270
+	page.preset = W.Text(page, "GameFontHighlight")
+	page.preset:SetPoint("TOPLEFT", x, -6)
+	page.title = W.Text(page, "GameFontNormalLarge", "Set up your Steam Deck")
+	page.title:SetPoint("TOPLEFT", x, -26)
+	page.intro = W.Text(page, "GameFontHighlightSmall", W.Color("muted",
+		"The addon can't change these. Copy the picture on the left:"))
+	page.intro:SetPoint("TOPLEFT", x, -48)
+	page.intro:SetWidth(colW)
+	page.intro:SetJustifyH("LEFT")
 
-	local top = -4 - #page.presets * 34 - 6
-	page.presetHeader = W.Text(page, "GameFontNormalLarge")
-	page.presetHeader:SetPoint("TOPLEFT", x + 2, top)
-	page.where = W.Text(page, "GameFontHighlightSmall", ns.DECK_GUIDE.where)
-	page.where:SetPoint("TOPLEFT", x + 2, top - 22)
-	page.where:SetWidth(230)
-	page.where:SetJustifyH("LEFT")
-	page.why = W.Text(page, "GameFontHighlightSmall")
-	page.why:SetPoint("TOPLEFT", x + 2, top - 52)
-	page.why:SetWidth(230)
-	page.why:SetJustifyH("LEFT")
+	-- a numbered step: blue badge, text, optional detail line
+	local function Step(n, y)
+		local f = CreateFrame("Frame", nil, page)
+		f:SetSize(colW, 34)
+		f:SetPoint("TOPLEFT", x, y)
+		f.badge = Rect(f, BLUE)
+		f.badge:SetSize(18, 18)
+		f.badge:SetPoint("TOPLEFT", 0, 0)
+		f.num = W.Text(f, "GameFontHighlight", tostring(n))
+		f.num:SetPoint("CENTER", f.badge, "CENTER", 0, 0)
+		f.text = W.Text(f, "GameFontHighlight")
+		f.text:SetPoint("TOPLEFT", 26, -2)
+		f.detail = W.Text(f, "GameFontHighlightSmall")
+		f.detail:SetPoint("TOPLEFT", 26, -18)
+		f.detail:SetWidth(colW - 26)
+		f.detail:SetJustifyH("LEFT")
+		return f
+	end
+
+	-- the Deck's "..." button: a dark pill with three dots
+	local function DotsIcon(parent, anchor)
+		local b = CreateFrame("Frame", nil, parent)
+		b:SetSize(32, 16)
+		b:SetPoint("LEFT", anchor, "RIGHT", 6, 0)
+		b.edge = Rect(b, KNOB, "BORDER")
+		b.edge:SetAllPoints()
+		b.bg = Rect(b, { 0.15, 0.16, 0.19 })
+		b.bg:SetPoint("TOPLEFT", 1, -1)
+		b.bg:SetPoint("BOTTOMRIGHT", -1, 1)
+		for i = -1, 1 do
+			local d = Rect(b, KNOB, "OVERLAY")
+			d:SetSize(4, 4)
+			d:SetPoint("CENTER", i * 8, 0)
+		end
+		return b
+	end
+
+	page.steps = {}
+	local s1 = Step(1, -74)
+	s1.text:SetText("Press")
+	s1.icon = DotsIcon(s1, s1.text)
+	s1.detail:SetText(W.Color("muted", "the button under the right trackpad"))
+	local s2 = Step(2, -112)
+	s2.text:SetText("Open " .. W.Color("custom", "Performance"))
+	s2.detail:SetText(W.Color("muted", "the lightning icon on the left of the menu"))
+	local s3 = Step(3, -150)
+	s3.text:SetText("Tap " .. W.Color("custom", "Advanced View"))
+	s3.detail:SetText(W.Color("muted", "only if you see it; when it reads Basic View you're there"))
+	local s4 = Step(4, -188)
+	s4.text:SetText("Change the blue-marked rows")
+	page.changes = s4.detail
+	page.steps = { s1, s2, s3, s4 }
+	page.done = W.Text(page, "GameFontHighlight")
+	page.done:SetPoint("TOPLEFT", x, -300)
+	page.done:SetWidth(colW)
+	page.done:SetJustifyH("LEFT")
+	page.done:SetText(W.Color("muted", "Leave the rest as in the picture. Close the menu with the same button: done!"))
 
 	function page.Refresh()
 		local key = Window.SelectedKey()
-		page.presets.Select(key)
-		for k, b in pairs(page.presetButtons) do
-			b:SetText(ns.Presets[k].label .. (ns.DB.activePreset == k and " *" or ""))
+		local active = ns.DB.activePreset
+		if active == key then
+			page.preset:SetText("Your preset: " .. W.Color("active", ns.Presets[key].label))
+		elseif not active then
+			page.preset:SetText(W.Color("drift", "No preset yet") .. ": showing " .. ns.Presets[key].label)
+		else
+			page.preset:SetText("Showing " .. W.Color("custom", ns.Presets[key].label)
+				.. W.Color("muted", " (yours is " .. ns.Presets[active].label .. ")"))
 		end
-		page.presetHeader:SetText(ns.Presets[key].label)
 
 		local y, lines = -HEAD_H, {}
 		for i, def in ipairs(ns.DECK_GUIDE.rows) do
@@ -180,12 +236,13 @@ ns.Window.RegisterTab("deck", "Steam Deck", function(page)
 				row:SetPoint("TOPLEFT", 0, y)
 				y = y - (def.kind == "section" and SECTION_H or ROW_H)
 				if r.varies then
-					lines[#lines + 1] = ("%s  %s\n%s"):format(def.label, W.Color("custom", r.text), W.Color("muted", r.why))
+					lines[#lines + 1] = ("%s  %s"):format(def.label, W.Color("custom", r.text))
 				end
 			end
 		end
 		panel:SetHeight(-y + 4)
-		page.why:SetText(table.concat(lines, "\n\n")
-			.. "\n\n" .. W.Color("muted", "Blue-marked rows change between presets; the rest are the same for all."))
+		page.changes:SetText(table.concat(lines, "\n"))
+		page.done:ClearAllPoints()
+		page.done:SetPoint("TOPLEFT", page.changes, "BOTTOMLEFT", -26, -16)
 	end
 end)

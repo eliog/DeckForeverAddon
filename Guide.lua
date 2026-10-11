@@ -4,8 +4,6 @@
 local _, ns = ...
 
 ns.DECK_GUIDE = {
-	where = "Press the ... button, open Performance (battery icon).",
-
 	-- The Quick Access Menu > Performance rows, top to bottom, as SteamOS shows them with the
 	-- advanced view open. kind: toggle | slider | choice | button | section. value is the same for
 	-- every preset unless presets[key] gives one; text overrides the shown value.

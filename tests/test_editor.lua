@@ -183,7 +183,7 @@ test("preset cards mark customized presets and jump to Customize and Steam Deck"
 	contains(win.pages.customize.summary.text, "Battery")
 	cards.quality.deck:Click()
 	ok(win.pages.deck:IsShown())
-	eq(win.pages.deck.presetHeader.text, "Max Quality")
+	contains(win.pages.deck.preset.text, "Max Quality")
 	win.reload:Click()
 	eq(w.reloads, 1)
 end)
@@ -198,7 +198,9 @@ test("Steam Deck guide shows the active preset's Quick Access settings", functio
 	w:slash("deck")
 	local g = w:frame("DeckForeverWindow").pages.deck
 	ok(g:IsShown())
-	contains(g.presetButtons.battery.text, "Battery *")
+	contains(g.preset.text, "Your preset: ")
+	contains(g.preset.text, "Battery")
+	ok(g.steps[1].icon, "step 1 shows the Deck's ... button")
 	local function Row(label)
 		for _, r in ipairs(g.rows) do
 			if r:IsShown() and r.setting.text:find(label, 1, true) then return r end
@@ -209,8 +211,10 @@ test("Steam Deck guide shows the active preset's Quick Access settings", functio
 	ok(Row("Frame Limit").mark:IsShown(), "rows that change between presets are marked")
 	ok(not Row("Allow Tearing").mark:IsShown())
 	ok(Row("Watts"), "TDP watts shown when the limit is on")
-	contains(g.why.text, "Frame Limit")
-	g.presetButtons.performance:Click()
+	contains(g.changes.text, "Frame Limit")
+	contains(g.changes.text, "30 FPS (90 Hz)")
+	w.ns.ShowGuide("performance")
+	contains(g.preset.text, "yours is Battery")
 	contains(Row("Frame Limit").value.text, "60 FPS (60 Hz)")
 	eq(Row("Watts"), nil, "no watts row with the TDP limit off")
 	contains(w.ns.DeckSummary("performance"), "TDP Limit Off")
