@@ -1,0 +1,6 @@
+package-as: DeckForever
+
+ignore:
+  - tests
+  - README.md
+  - .github

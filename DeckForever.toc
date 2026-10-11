@@ -1,0 +1,31 @@
+## Interface: 16001
+## Title: DeckForever
+## Notes: Steam Deck presets for World of Warcraft: Forever: Battery, Balanced, Max FPS, Max Quality. Controller friendly.
+## Author: eliog
+## Version: @project-version@
+## IconTexture: Interface\AddOns\DeckForever\Media\icon
+## SavedVariables: DeckForeverDB
+## X-Website: https://github.com/eliog/DeckForeverAddon
+
+Core.lua
+Presets.lua
+Settings.lua
+Guide.lua
+CVars.lua
+Snapshot.lua
+Apply.lua
+Detect.lua
+Reminder.lua
+UIScale.lua
+UI\Widgets.lua
+UI\GamePad.lua
+UI\Window.lua
+UI\Tabs\Presets.lua
+UI\Tabs\Customize.lua
+UI\Tabs\Deck.lua
+UI\Tabs\Options.lua
+UI\Options.lua
+UI\Prompt.lua
+UI\Keep.lua
+UI\Minimap.lua
+Slash.lua

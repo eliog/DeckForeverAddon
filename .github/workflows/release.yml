@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+      GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: sudo apt-get update && sudo apt-get install -y luajit
+      - run: luajit tests/run.lua
+      # Builds one zip plus release.json and uploads to GitHub, CurseForge and Wago
+      # (CurseForge/Wago only once X-Curse-Project-ID / X-Wago-ID are in the TOC).
+      - uses: BigWigsMods/packager@v2
