@@ -6,29 +6,26 @@ local _, ns = ...
 ns.DECK_GUIDE = {
 	where = "Press the ... button, open Performance (battery icon).",
 
-	-- The Quick Access Menu > Performance rows, top to bottom. kind: toggle | slider | choice.
-	-- value is the same for every preset unless presets[key] gives one; text overrides the shown value.
+	-- The Quick Access Menu > Performance rows, top to bottom, as SteamOS shows them with the
+	-- advanced view open. kind: toggle | slider | choice | button | section. value is the same for
+	-- every preset unless presets[key] gives one; text overrides the shown value.
 	rows = {
-		{ id = "overlay", label = "Performance Overlay Level", kind = "slider", min = 0, max = 4, value = 0,
-			text = "Off", why = "Level 2 shows fps and battery watts, if you are curious" },
+		{ id = "overlay", label = "Performance Overlay Level", kind = "choice", value = "Off",
+			choices = { "Off", "1", "2", "3", "4" }, why = "Level 2 shows fps and battery watts, if you are curious" },
+		{ id = "advanced", label = "Basic View", kind = "button",
+			why = "Tap Advanced View until the button reads Basic View: the settings below appear" },
+		{ id = "section", label = "PERFORMANCE SETTINGS", kind = "section" },
 		{ id = "profile", label = "Use per-game profile", kind = "toggle", value = true,
 			why = "These settings then apply to WoW only" },
-		{ id = "refresh", label = "Refresh Rate", kind = "slider", min = 45, max = 90, unit = " Hz",
+		{ id = "limit", label = "Frame Limit", kind = "slider", min = 10, max = 90,
 			presets = {
-				battery = { value = 90, why = "30 fps shown three times (LCD Deck: 60 Hz)" },
-				balanced = { value = 90, why = "45 fps shown twice (LCD Deck: 40 Hz, and Max FPS 40 in Customize)" },
-				performance = { value = 60, why = "Matches the 60 fps cap" },
-				quality = { value = 90, why = "30 fps shown three times (LCD Deck: 60 Hz)" },
+				battery = { value = 30, text = "30 FPS (90 Hz)", why = "Same as the preset's cap; 30 fps shown three times on the OLED (LCD: 30 FPS at 60 Hz)" },
+				balanced = { value = 45, text = "45 FPS (90 Hz)", why = "Same as the preset's cap; 45 fps shown twice (LCD: 40 FPS, and Max FPS 40 in Customize)" },
+				performance = { value = 60, text = "60 FPS (60 Hz)", why = "Same as the preset's cap" },
+				quality = { value = 30, text = "30 FPS (90 Hz)", why = "Same as the preset's cap; 30 fps shown three times" },
 			} },
-		{ id = "limit", label = "Framerate Limit", kind = "slider", min = 0, max = 90, unit = " FPS",
-			presets = {
-				battery = { value = 30, why = "Same as the preset's cap. Off works too: the game caps itself" },
-				balanced = { value = 45, why = "Same as the preset's cap. Off works too" },
-				performance = { value = 60, why = "Same as the preset's cap. Off works too" },
-				quality = { value = 30, why = "Same as the preset's cap. Off works too" },
-			} },
-		{ id = "advanced", label = "Show advanced view", kind = "toggle", value = true,
-			why = "Shows the settings below" },
+		{ id = "nolimit", label = "Disable Frame Limit", kind = "toggle", value = false,
+			why = "On works too: the preset caps the game itself" },
 		{ id = "tearing", label = "Allow Tearing", kind = "toggle", value = false, why = "The game uses VSync" },
 		{ id = "hrs", label = "Half Rate Shading", kind = "toggle", value = false, why = "Blurs the picture for little gain" },
 		{ id = "tdp", label = "TDP Limit", kind = "toggle",
@@ -38,16 +35,20 @@ ns.DECK_GUIDE = {
 				performance = { value = false, why = "Full power (15 W)" },
 				quality = { value = false, why = "Full power; best plugged in" },
 			} },
-		{ id = "watts", label = "Watts", kind = "slider", min = 3, max = 15, unit = " W", sub = true,
+		{ id = "watts", label = "Watts", kind = "slider", min = 3, max = 15, sub = true,
 			presets = {
-				battery = { value = 10, text = "8-10 W", why = "At 30 fps 8 W saves a little more; same picture" },
-				balanced = { value = 10, why = "Measured about 3.7 h questing" },
+				battery = { value = 10, text = "8-10 Watts", why = "At 30 fps 8 W saves a little more; same picture" },
+				balanced = { value = 10, text = "10 Watts", why = "Measured about 3.7 h questing" },
 			} },
-		{ id = "gpu", label = "Manual GPU Clock Control", kind = "toggle", value = false,
+		{ id = "gpu", label = "Manual GPU Clock", kind = "toggle", value = false,
 			why = "Let the Deck balance CPU and GPU" },
+		{ id = "mode", label = "Scaling Mode", kind = "choice", value = "Auto",
+			choices = { "Auto", "Integer", "Fit", "Stretch", "Fill" }, why = "The game already runs at the screen's size" },
 		{ id = "filter", label = "Scaling Filter", kind = "choice", value = "Linear",
-			choices = { "Linear", "Pixel", "FSR", "NIS" },
-			why = "FSR/NIS here blur the interface; the presets use the game's own upscaler" },
+			choices = { "Linear", "Pixel", "Sharp" },
+			why = "Sharp/FSR here also sharpens the interface; the presets use the game's own upscaler" },
+		{ id = "steamoverlay", label = "Show Perf Overlay in Steam", kind = "toggle", value = false,
+			why = "Only affects Steam's own screens" },
 	},
 }
 
@@ -61,8 +62,8 @@ function ns.DeckRow(row, key)
 	local text = (p and p.text) or (not p and row.text)
 	if not text then
 		if row.kind == "toggle" then text = value and "On" or "Off"
-		elseif row.kind == "slider" then text = (row.id == "limit" and value == 0) and "Off" or (value .. (row.unit or ""))
-		else text = tostring(value) end
+		elseif row.kind == "slider" then text = value .. (row.unit or "")
+		else text = value and tostring(value) or "" end
 	end
 	return { value = value, text = text, why = (p and p.why) or row.why, varies = row.presets ~= nil }
 end

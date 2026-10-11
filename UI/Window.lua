@@ -143,7 +143,7 @@ local function Build()
 	if opts.point then
 		f:SetPoint(opts.point[1], UIParent, opts.point[2], opts.point[3], opts.point[4])
 	else
-		f:SetPoint("CENTER")
+		f:SetPoint("LEFT", 8, 0) -- left edge: the Deck's Quick Access menu opens on the right
 	end
 	table.insert(UISpecialFrames, "DeckForeverWindow")
 

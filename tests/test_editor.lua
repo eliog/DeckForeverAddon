@@ -194,24 +194,24 @@ test("Steam Deck guide shows the active preset's Quick Access settings", functio
 	local w = mock.new({ screen = { 1920, 1080 } })
 	w:login()
 	w:slash("apply battery")
-	contains(w:chatText(), "Steam Deck (... > Performance): Refresh Rate 90 Hz, Framerate Limit 30 FPS, TDP 8-10 W.")
+	contains(w:chatText(), "Steam Deck (... > Performance): Frame Limit 30 FPS (90 Hz), TDP 8-10 Watts.")
 	w:slash("deck")
 	local g = w:frame("DeckForeverWindow").pages.deck
 	ok(g:IsShown())
-	contains(g.presetButtons.battery.text, "Battery (active)")
+	contains(g.presetButtons.battery.text, "Battery *")
 	local function Row(label)
 		for _, r in ipairs(g.rows) do
 			if r:IsShown() and r.setting.text:find(label, 1, true) then return r end
 		end
 	end
 	eq(g.rows[1].setting.text, "Performance Overlay Level", "same order as the Deck's menu")
-	contains(Row("Refresh Rate").value.text, "90 Hz")
-	ok(Row("Refresh Rate").mark:IsShown(), "rows that change between presets are marked")
+	contains(Row("Frame Limit").value.text, "30 FPS (90 Hz)")
+	ok(Row("Frame Limit").mark:IsShown(), "rows that change between presets are marked")
 	ok(not Row("Allow Tearing").mark:IsShown())
 	ok(Row("Watts"), "TDP watts shown when the limit is on")
-	contains(g.why.text, "Framerate Limit")
+	contains(g.why.text, "Frame Limit")
 	g.presetButtons.performance:Click()
-	contains(Row("Refresh Rate").value.text, "60 Hz")
+	contains(Row("Frame Limit").value.text, "60 FPS (60 Hz)")
 	eq(Row("Watts"), nil, "no watts row with the TDP limit off")
 	contains(w.ns.DeckSummary("performance"), "TDP Limit Off")
 end)
