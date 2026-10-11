@@ -16,8 +16,15 @@ function ns.CancelKeep() Stop() end
 
 function ns.KeepPending() return undo ~= nil end
 
+-- Kept: on a Deck, show the Steam Deck tab when the new preset wants different Quick Access
+-- settings than the one before, so the player remembers to change them too.
 function ns.KeepSettings()
+	local u = undo
 	Stop()
+	local key = ns.DB.activePreset
+	if not u or not key or not ns.LooksLikeDeck() then return end
+	local before = u.activePreset and ns.DeckSummary(u.activePreset)
+	if ns.DeckSummary(key) ~= before then ns.ShowGuide(key) end
 end
 
 -- Puts back the settings from before the last apply.

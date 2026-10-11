@@ -207,3 +207,32 @@ test("controller: left/right on a stepper steps it; B on Keep reverts; menu and 
 	ok(not p:IsShown(), "A on the prompt takes the recommended preset")
 	eq(w2.ns.DB.activePreset, "battery")
 end)
+
+test("on a Deck, keeping a preset with different Deck settings opens the Steam Deck tab", function()
+	local w = mock.new() -- 1280x800
+	w:login()
+	w:slash("apply battery")
+	w.ns.KeepSettings()
+	local win = w:frame("DeckForeverWindow")
+	ok(win:IsShown() and win.pages.deck:IsShown(), "first preset: set up the Deck")
+	contains(win.pages.deck.preset.text, "Battery")
+	win:Hide()
+
+	w:slash("apply battery")
+	w.ns.KeepSettings()
+	ok(not win:IsShown(), "same Deck settings: nothing to do")
+
+	w:slash("apply quality") -- also 30 fps at 90 Hz, but TDP off
+	w.ns.RevertLastApply()
+	ok(not win:IsShown(), "reverted: no reminder")
+
+	w:slash("apply balanced")
+	w.ns.KeepSettings()
+	ok(win:IsShown() and win.pages.deck:IsShown(), "45 fps: new Frame Limit")
+
+	local w2 = mock.new({ screen = { 1920, 1080 } })
+	w2:login()
+	w2:slash("apply balanced")
+	w2.ns.KeepSettings()
+	ok(not (w2:frame("DeckForeverWindow") and w2:frame("DeckForeverWindow"):IsShown()), "not on a Deck: no tab")
+end)
